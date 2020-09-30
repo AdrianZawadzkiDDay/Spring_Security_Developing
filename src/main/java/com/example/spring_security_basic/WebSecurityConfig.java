@@ -15,6 +15,8 @@ import java.util.Collections;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    // WebSecurityConfigurerAdapter dodaje domyslną formatke logowania
+
     @Bean
     PasswordEncoder getPasswordEncodrr() {
         return new BCryptPasswordEncoder();
@@ -39,6 +41,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
+        // dostep do endpointow
+        http.authorizeRequests()
+                .antMatchers("/forAdmin").hasRole("ADMIN")
+                .antMatchers("/forUser").hasAnyRole("USER", "ADMIN")
+                .and()
+                .formLogin().permitAll() // dopusc wszystkich do formatki logowania
+                .and()
+                .logout().logoutSuccessUrl("/bye");
     }
 }
