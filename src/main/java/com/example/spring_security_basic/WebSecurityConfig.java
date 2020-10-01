@@ -38,8 +38,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/forAdmin").hasRole("ADMIN")
                 .antMatchers("/forUser").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/singup").permitAll()
                 .and()
-                .formLogin().defaultSuccessUrl("/forUser").permitAll() // dopusc wszystkich do formatki logowania
+                .formLogin().loginPage("/login").defaultSuccessUrl("/forUser").permitAll() // dopusc wszystkich do formatki logowania
                 .and()
                 .logout().logoutSuccessUrl("/bye");
     }

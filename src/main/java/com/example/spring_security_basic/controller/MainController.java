@@ -1,24 +1,23 @@
-package pl.bykowski.springboot2security.controller;
+package com.example.spring_security_basic.controller;
 
+import com.example.spring_security_basic.entities.AppUser;
+import com.example.spring_security_basic.repositories.AppUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import pl.bykowski.springboot2security.entity.AppUser;
-import pl.bykowski.springboot2security.repo.AppUserRepo;
-import pl.bykowski.springboot2security.service.UserService;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class MainController {
 
+    private AppUserRepository appUserRepository;
+    private PasswordEncoder passwordEncoder;
 
-    private UserService userService;
-
-    public MainController(UserService userService) {
-        this.userService = userService;
+    @Autowired
+    public MainController(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder) {
+        this.appUserRepository = appUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @RequestMapping("/login")
@@ -32,14 +31,12 @@ public class MainController {
     }
 
     @RequestMapping("/register")
-    public ModelAndView register(AppUser user, HttpServletRequest request) {
-        userService.addNewUser(user, request);
+    public ModelAndView register(AppUser user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        appUserRepository.save(user);
+
+        // po zarejestrowaniu przekierowywuje do formatki logowania
         return new ModelAndView("redirect:/login");
     }
 
-    @RequestMapping("/verify-token")
-    public ModelAndView register(@RequestParam String token) {
-        userService.verifyToken(token);
-        return new ModelAndView("redirect:/login");
-    }
 }
