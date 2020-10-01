@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/forAdmin").hasRole("ADMIN")
                 .antMatchers("/forUser").hasAnyRole("USER", "ADMIN")
                 .and()
-                .formLogin().permitAll() // dopusc wszystkich do formatki logowania
+                .formLogin().defaultSuccessUrl("/forUser").permitAll() // dopusc wszystkich do formatki logowania
                 .and()
                 .logout().logoutSuccessUrl("/bye");
     }
