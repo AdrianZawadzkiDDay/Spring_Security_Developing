@@ -1,5 +1,6 @@
 package com.example.spring_security_basic;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -17,25 +19,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // WebSecurityConfigurerAdapter dodaje domyslną formatke logowania
 
-    @Bean
-    PasswordEncoder getPasswordEncodrr() {
-        return new BCryptPasswordEncoder();
+    private UserDetailsService userDetailService;
+
+    @Autowired
+    public WebSecurityConfig(UserDetailsService userDetailService) {
+        this.userDetailService = userDetailService;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        User userAdmin = new User("Jan",
-                getPasswordEncodrr().encode("jan123"),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
-
-        User userUser = new User("Karol",
-                getPasswordEncodrr().encode("karol123"),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
-
-        // uzytkownicy przechowywani w pamieci
-        auth.inMemoryAuthentication().withUser(userAdmin);
-        auth.inMemoryAuthentication().withUser(userUser);
-
+        auth.userDetailsService(userDetailService);
     }
 
 
@@ -49,5 +42,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().permitAll() // dopusc wszystkich do formatki logowania
                 .and()
                 .logout().logoutSuccessUrl("/bye");
+    }
+
+
+    @Bean
+    PasswordEncoder getPasswordEncodrr() {
+        return new BCryptPasswordEncoder();
     }
 }
