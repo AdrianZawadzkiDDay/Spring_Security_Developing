@@ -2,6 +2,7 @@ package com.example.spring_security_basic.controller;
 
 import com.example.spring_security_basic.entities.AppUser;
 import com.example.spring_security_basic.repositories.AppUserRepository;
+import com.example.spring_security_basic.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -11,13 +12,11 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class MainController {
 
-    private AppUserRepository appUserRepository;
-    private PasswordEncoder passwordEncoder;
+    private UserService userService;
 
     @Autowired
-    public MainController(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder) {
-        this.appUserRepository = appUserRepository;
-        this.passwordEncoder = passwordEncoder;
+    public MainController(UserService userService) {
+        this.userService = userService;
     }
 
     @RequestMapping("/login")
@@ -32,9 +31,7 @@ public class MainController {
 
     @RequestMapping("/register")
     public ModelAndView register(AppUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        appUserRepository.save(user);
-
+        userService.addNewUser(user);
         // po zarejestrowaniu przekierowywuje do formatki logowania
         return new ModelAndView("redirect:/login");
     }
